@@ -38,10 +38,9 @@ func (d *deathmatch) ExecuteTurn() error {
 	if err := d.isGameOver(); err != nil {
 		return err
 	}
-	if err := d.movePieces(); err != nil {
-		return err
-	}
-	return d.fight()
+	d.movePieces()
+	d.fight()
+	return nil
 }
 
 func (d *deathmatch) isGameOver() error {
@@ -49,31 +48,29 @@ func (d *deathmatch) isGameOver() error {
 		return errors.New("every man for himself! the world is collapsing")
 	}
 	if !d.board.HasLinks() {
-		return errors.New("game over: all aliens are stuck")
+		return errors.New("game over - all aliens are stuck")
+	}
+	if len(d.board.Pieces()) < 2 {
+		return errors.New("war is over")
 	}
 	return nil
 }
 
-func (d *deathmatch) movePieces() error {
+func (d *deathmatch) movePieces() {
 	// First, move aliens
 	for _, piece := range d.board.Pieces() {
 		if err := piece.Wander(); err != nil {
-			log.Printf("%s is stuck at %s", piece.Name(), piece.Location().Name())
+			log.Printf("piece.Wander: %s", err.Error())
 		}
 	}
-	return nil
 }
 
-func (d *deathmatch) fight() error {
+func (d *deathmatch) fight() {
 	for _, location := range d.board.Locations() {
 		if len(location.Pieces()) >= 2 {
 			d.board.DestroyLocation(location)
 		}
 	}
-	if len(d.board.Pieces()) < 2 {
-		return errors.New("shut down the internet, folks! We have a winner")
-	}
-	return nil
 }
 
 func generateSillyName() string {
