@@ -1,5 +1,6 @@
 package board
 
+// Board defines the
 type Board interface {
 	// Functional to board creation
 	AddLocation(name string)
@@ -12,28 +13,14 @@ type Board interface {
 	Pieces() []Piece
 }
 
-type Piece interface {
-	Name() string
-	Location() Location
-	Wander() error
-	NMoves() int
-}
-
 type Location interface {
 	Name() string
 	Pieces() []Piece
-	HasNeighbours() bool
+	ReachableNeighbours() []Location
 	Neighbour(dir Direction) Location
 	LinkToNeighbour(dir Direction, target Location)
-	DeployPiece(p Piece)
+	AddPiece(p Piece)
+	RemovePiece(p Piece)
 }
 
 type Direction string
-
-func NewBoard() Board {
-	panic("not implemented")
-}
-
-func NewLocation(name string) Location {
-	panic("not implemented")
-}
