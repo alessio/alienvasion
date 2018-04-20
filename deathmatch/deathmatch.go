@@ -24,26 +24,30 @@ func (d *deathmatch) Board() board.Board {
 }
 
 func (d *deathmatch) KickOff(npieces int) {
+	log.Print("Kick off!")
 	for i := 0; i < npieces; i++ {
-		d.board.DeployPiece(board.Piece(
-			fmt.Sprintf("%s-%d", generateSillyName(), i)))
+		name := fmt.Sprintf("%s-%d", generateSillyName(), i)
+		location := d.board.DeployPiece(board.Piece(name))
+		log.Printf(" - %q deployed on %q", name, location.Name())
 	}
 }
 
-func (d *deathmatch) ExecuteTurn() error {
+func (d *deathmatch) ExecuteTurn() bool {
 	defer func() { d.turn++ }()
-	if d.turn >= d.maxmoves {
-		return fmt.Errorf("reached maximum number of moves")
-	}
+	log.Printf("]-[ Turn #%d ]-[", d.turn)
 	if err := d.isGameOver(); err != nil {
-		return err
+		log.Println(err.Error())
+		return false
 	}
 	d.movePieces()
 	d.fight()
-	return nil
+	return true
 }
 
 func (d *deathmatch) isGameOver() error {
+	if d.turn >= d.maxmoves {
+		return fmt.Errorf("reached maximum number of moves")
+	}
 	if len(d.board.Locations()) == 0 {
 		return errors.New("every man for himself! the world is collapsing")
 	}
@@ -69,6 +73,7 @@ func (d *deathmatch) fight() {
 	for _, location := range d.board.Locations() {
 		if len(location.Pieces()) >= 2 {
 			d.board.DestroyLocation(location.Name())
+			log.Printf("%q has been destroyed by %s", location.Name(), location.Pieces())
 		}
 	}
 }
