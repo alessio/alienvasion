@@ -24,6 +24,7 @@ const (
 var (
 	naliens  int
 	maxmoves int
+	filename string
 )
 
 func init() {
@@ -57,15 +58,27 @@ through it. This may lead to aliens getting "trapped".
 	}
 	flag.IntVar(&naliens, "naliens", DefaultNAliens, "generate N aliens")
 	flag.IntVar(&maxmoves, "maxmoves", DefaultMaxMoves, "max number of moves each alien can make")
+	flag.StringVar(&filename, "file", "", "read map from file instead of STDIN")
 	log.SetPrefix(fmt.Sprintf("%s: ", path.Base(os.Args[0])))
 	//	log.SetFlags(0)
 }
 
 func main() {
+	var b board.Board
+	var inputFile io.Reader
 	flag.Parse()
 	validateFlags()
 	// Initialise the board
-	b := mustParseBoard(os.Stdin)
+	inputFile = os.Stdin
+	if filename != "" {
+		inputFile, err := os.Open(filename)
+		if err != nil {
+			log.Fatal(err)
+		}
+		b = mustParseBoard(inputFile)
+	} else {
+		b = mustParseBoard(inputFile)
+	}
 	fmt.Println("Board generated and aliens deployed:")
 	board.PrintBoard(b, 4)
 	// Initialise the simulation
