@@ -40,6 +40,7 @@ func main() {
 	b := mustParseBoard(os.Stdin)
 	fmt.Println("Board generated and aliens deployed:")
 	board.PrintBoard(b)
+	validateAliensAgainstBoardSize(len(b.Locations()))
 	// Initialise the simulation
 	dm := deathmatch.NewDeathMatch(b, maxmoves)
 	dm.KickOff(naliens)
@@ -51,16 +52,27 @@ func main() {
 	}
 }
 
-func validateFlags() {
-	if naliens < 2 {
-		log.Fatal("the number of aliens must be greater than 1.")
-	}
-}
-
 func mustParseBoard(reader io.Reader) board.Board {
 	b, err := board.ParseBoard(reader)
 	if err != nil {
 		log.Fatalf("board.ParseBoard: %v", err)
 	}
 	return b
+}
+
+func validateFlags() {
+	if naliens < 2 {
+		log.Fatal("the number of aliens must be greater than 1.")
+	}
+	if maxmoves < 0 {
+		log.Fatal("the maximum number of moves must be equal or greater than 0.")
+	}
+}
+
+func validateAliensAgainstBoardSize(boardSize int) {
+	if naliens > boardSize {
+		log.Fatalf(
+			"the number of aliens (%d) must be equal or smaller than the number of cities (%d).",
+			naliens, boardSize)
+	}
 }
