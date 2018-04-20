@@ -12,7 +12,7 @@ type Board interface {
 	// Functional to board creation/initialization
 	AddLocation(name string)
 	LinkLocations(from, to string, dir Direction) error
-	DeployPiece(p Piece)
+	DeployPiece(p Piece) Location
 	// Functional to death match simulation
 	DestroyLocation(name string)
 	HasLinks() bool
@@ -35,15 +35,15 @@ func NewBoard() *worldMap {
 }
 
 func (w *worldMap) AddLocation(name string) { w.locations[name] = NewLocation(name) }
-func (w *worldMap) DeployPiece(p Piece) {
-	for _, location := range w.locations {
-		if len(location.Pieces()) == 0 {
-			location.AddPiece(p)
-			w.pieces[p] = location
-			return
-		}
+func (w *worldMap) DeployPiece(p Piece) Location {
+	locations := w.Locations()
+	if len(locations) == 0 {
+		panic("no locations left")
 	}
-	panic("there are no free locations left")
+	l := w.Locations()[rand.Intn(len(locations))]
+	l.AddPiece(p)
+	w.pieces[p] = l
+	return l
 }
 
 func (w *worldMap) DestroyLocation(name string) {

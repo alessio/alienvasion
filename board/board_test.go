@@ -69,6 +69,7 @@ func Test_worldMap_DestroyLocation(t *testing.T) {
 	board1.AddLocation("c")
 	board1.DeployPiece("x")
 	board1.DeployPiece("y")
+	board1.DeployPiece("w")
 	board1.DeployPiece("z")
 	// a <==> b <==> c
 	board1.LinkLocations("a", "b", West)
@@ -77,32 +78,26 @@ func Test_worldMap_DestroyLocation(t *testing.T) {
 	require.Equal(t, board1.Location("b").Neighbour(West).Name(), "c")
 	require.Equal(t, board1.Location("c").Neighbour(East).Name(), "b")
 	require.Equal(t, board1.Location("b").Neighbour(East).Name(), "a")
-	require.Equal(t, len(board1.Location("a").Pieces()), 1)
-	require.Equal(t, len(board1.Location("b").Pieces()), 1)
-	require.Equal(t, len(board1.Location("c").Pieces()), 1)
-	require.Equal(t, len(board1.Pieces()), 3)
+	require.Equal(t, len(board1.Pieces()), 4)
 
+	nDeadPieces := len(board1.Location("b").Pieces())
 	board1.DestroyLocation("b")
 	assert.Nil(t, board1.Location("a").Neighbour(West))
 	assert.Nil(t, board1.Location("c").Neighbour(East))
-	assert.Equal(t, len(board1.Pieces()), 2)
-	assert.Equal(t, len(board1.Location("a").Pieces()), 1)
-	assert.Equal(t, len(board1.Location("c").Pieces()), 1)
+	assert.Equal(t, len(board1.Pieces()), 4-nDeadPieces)
 }
 
 func Test_worldMap_DeployPiece(t *testing.T) {
 	names := []string{"a", "b", "c"}
 	board1 := NewBoard()
+	// Panic expected, board is empty
+	assert.Panics(t, func() { board1.DeployPiece("z") })
+	// Add locations
 	for _, n := range names {
 		board1.AddLocation(n)
 	}
 	board1.DeployPiece("x")
 	assert.Equal(t, board1.Pieces(), []Piece{Piece("x")})
-
-	// Test panic
-	board1.DeployPiece("y")
-	board1.DeployPiece("w")
-	assert.Panics(t, func() { board1.DeployPiece("z") })
 }
 
 func Test_worldMap_MovePiece(t *testing.T) {

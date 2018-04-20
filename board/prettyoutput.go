@@ -1,24 +1,29 @@
 package board
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
-func PrintBoard(b Board) {
+func PrintBoard(b Board, indent int) {
 	var w = b.(*worldMap)
 	for _, location := range w.locations {
-		printLocation(location)
+		printLocation(location, indent)
 	}
-	// for _, piece := range w.pieces {
-	// 	s += fmt.Sprintf("%s\n", alien)
-	// }
 }
 
-func printLocation(loc Location) {
+func printLocation(loc Location, indent int) {
 	var l = loc.(*location)
-	s := l.Name() + ":"
+	s := strings.Repeat(" ", indent) + l.Name() + ":"
 	for k, v := range l.neighbours {
 		if v != nil {
 			s += fmt.Sprintf(" %s=%s", string(k), v.Name())
 		}
 	}
+	s += " ["
+	for _, v := range loc.Pieces() {
+		s += string(v)
+	}
+	s += "]"
 	println(s)
 }
