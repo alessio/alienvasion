@@ -10,7 +10,6 @@ import (
 
 	"github.com/alessio/alienvasion/board"
 	"github.com/alessio/alienvasion/deathmatch"
-	"github.com/dustinkirkland/golang-petname"
 )
 
 const (
@@ -39,7 +38,8 @@ func main() {
 	validateFlags()
 	// Initialise the board
 	b := mustParseBoard(os.Stdin)
-	fmt.Printf("Board generated and aliens deployed: \n%s\n", b)
+	fmt.Println("Board generated and aliens deployed:")
+	board.PrintBoard(b)
 	// Initialise the simulation
 	dm := deathmatch.NewDeathMatch(b, maxmoves)
 	dm.KickOff(naliens)
@@ -63,8 +63,4 @@ func mustParseBoard(reader io.Reader) board.Board {
 		log.Fatalf("board.ParseBoard: %v", err)
 	}
 	return b
-}
-
-func generateSillyName() string {
-	return petname.Generate(3, "-")
 }
