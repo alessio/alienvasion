@@ -23,6 +23,7 @@ type Location interface {
 	ReachableNeighbours() []Location
 	Neighbour(dir Direction) Location
 	LinkToNeighbour(dir Direction, target Location)
+	UnlinkNeighbour(dir Direction)
 	DestroyLinks()
 	AddPiece(p Piece)
 	RemovePiece(p Piece)
@@ -58,12 +59,10 @@ func (l *location) Neighbour(dir Direction) Location {
 	}
 	return nil
 }
-func (l *location) LinkToNeighbour(dir Direction, target Location) {
-	t := target.(*location)
-	l.neighbours[dir] = t
-}
-func (l *location) AddPiece(p Piece)    { l.pieces[p] = true }
-func (l *location) RemovePiece(p Piece) { delete(l.pieces, p) }
+func (l *location) LinkToNeighbour(dir Direction, target Location) { l.neighbours[dir] = target }
+func (l *location) UnlinkNeighbour(dir Direction)                  { l.neighbours[dir] = nil }
+func (l *location) AddPiece(p Piece)                               { l.pieces[p] = true }
+func (l *location) RemovePiece(p Piece)                            { delete(l.pieces, p) }
 func (l *location) Pieces() []Piece {
 	pieces := []Piece{}
 	for p := range l.pieces {
@@ -82,6 +81,10 @@ func (l *location) ReachableNeighbours() []Location {
 }
 func (l *location) DestroyLinks() {
 	for dir := range l.neighbours {
+		if neighbour := l.Neighbour(dir); neighbour != nil {
+			l.UnlinkNeighbour(dir)
+			neighbour.UnlinkNeighbour(OppositeDirection(dir))
+		}
 		delete(l.neighbours, dir)
 	}
 }
