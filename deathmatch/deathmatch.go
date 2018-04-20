@@ -42,12 +42,25 @@ func (d *deathmatch) ExecuteTurn() bool {
 	d.movePieces()
 	d.fight()
 	// print out pieces
-	s := ""
-	for _, p := range d.board.Pieces() {
-		s += fmt.Sprintf("%v:%s ", p, d.board.WhereIs(p).Name())
-	}
-	log.Println("pieces still alive:", s)
+	log.Println("pieces still alive:", alivePieces(d.board))
+	log.Println("locations still alive:", stillStandingLocations(d.board))
 	return true
+}
+
+func stillStandingLocations(b board.Board) string {
+	s := ""
+	for _, l := range b.Locations() {
+		s += fmt.Sprintf("%s ", l.Name())
+	}
+	return s
+}
+
+func alivePieces(b board.Board) string {
+	s := ""
+	for _, p := range b.Pieces() {
+		s += fmt.Sprintf("%v:%s ", p, b.WhereIs(p).Name())
+	}
+	return s
 }
 
 func (d *deathmatch) isGameOver() error {
