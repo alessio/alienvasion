@@ -40,3 +40,85 @@ func Test_worldMap_LinkLocations(t *testing.T) {
 	assert.Equal(t, board1.Location("d").Neighbour(South), nil)
 	assert.Equal(t, board1.Location("d").Neighbour(West), nil)
 }
+
+func Test_worldMap_LinkLocations_Simmetry(t *testing.T) {
+	board1 := NewBoard()
+	board1.AddLocation("a")
+	board1.AddLocation("b")
+	board1.LinkLocations("a", "b", West)
+	board2 := NewBoard()
+	board2.AddLocation("a")
+	board2.AddLocation("b")
+	board2.LinkLocations("b", "a", East)
+	assert.Equal(
+		t,
+		board1.Location("a").Neighbour(West).Name(),
+		board2.Location("a").Neighbour(West).Name(),
+	)
+	assert.Equal(
+		t,
+		board1.Location("b").Neighbour(East).Name(),
+		board2.Location("b").Neighbour(East).Name(),
+	)
+}
+
+func Test_worldMap_DestroyLocation(t *testing.T) {
+	board1 := NewBoard()
+	board1.AddLocation("a")
+	board1.AddLocation("b")
+	board1.AddLocation("c")
+	board1.DeployPiece("x")
+	board1.DeployPiece("y")
+	board1.DeployPiece("z")
+	// a <==> b <==> c
+	board1.LinkLocations("a", "b", West)
+	board1.LinkLocations("b", "c", West)
+	require.Equal(t, board1.Location("a").Neighbour(West).Name(), "b")
+	require.Equal(t, board1.Location("b").Neighbour(West).Name(), "c")
+	require.Equal(t, board1.Location("c").Neighbour(East).Name(), "b")
+	require.Equal(t, board1.Location("b").Neighbour(East).Name(), "a")
+	require.Equal(t, len(board1.Location("a").Pieces()), 1)
+	require.Equal(t, len(board1.Location("b").Pieces()), 1)
+	require.Equal(t, len(board1.Location("c").Pieces()), 1)
+	require.Equal(t, len(board1.Pieces()), 3)
+
+	board1.DestroyLocation("b")
+	assert.Nil(t, board1.Location("a").Neighbour(West))
+	assert.Nil(t, board1.Location("c").Neighbour(East))
+	assert.Equal(t, len(board1.Pieces()), 2)
+	assert.Equal(t, len(board1.Location("a").Pieces()), 1)
+	assert.Equal(t, len(board1.Location("c").Pieces()), 1)
+}
+
+func Test_worldMap_DeployPiece(t *testing.T) {
+	names := []string{"a", "b", "c"}
+	board1 := NewBoard()
+	for _, n := range names {
+		board1.AddLocation(n)
+	}
+	board1.DeployPiece("x")
+	assert.Equal(t, board1.Pieces(), []Piece{Piece("x")})
+
+	// Test panic
+	board1.DeployPiece("y")
+	board1.DeployPiece("w")
+	assert.Panics(t, func() { board1.DeployPiece("z") })
+}
+
+func Test_worldMap_MovePiece(t *testing.T) {
+	board1 := NewBoard()
+	board1.AddLocation("a")
+	board1.DeployPiece("x")
+	require.Equal(t, board1.Pieces(), []Piece{Piece("x")})
+	require.Equal(t, board1.Location("a").Pieces(), []Piece{Piece("x")})
+	// Add a location
+	board1.AddLocation("b")
+	board1.LinkLocations("a", "b", West)
+	assert.Equal(t, board1.Pieces(), []Piece{Piece("x")})
+	assert.Equal(t, board1.Location("a").Pieces(), []Piece{Piece("x")})
+	assert.Equal(t, board1.Location("b").Pieces(), []Piece{})
+	// assert.Equal(t, board1.Pieces(), []Piece{Piece("x")})
+	board1.MovePiece("x")
+	assert.Equal(t, board1.Pieces(), []Piece{Piece("x")})
+	assert.Equal(t, board1.Location("a").Pieces(), []Piece{})
+}
