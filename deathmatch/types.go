@@ -8,5 +8,5 @@ import (
 type DeathMatch interface {
 	Board() board.Board
 	KickOff(npieces int)
-	ExecuteTurn() error
+	ExecuteTurn() bool
 }
