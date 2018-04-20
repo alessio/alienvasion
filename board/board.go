@@ -112,7 +112,7 @@ func (w *worldMap) MovePiece(p Piece) error {
 	}
 	next := pickRandomNeighbour(pieceLocation)
 	if next == nil {
-		return fmt.Errorf("%s got stuck at %s", string(p), pieceLocation.Name())
+		return fmt.Errorf("%s trapped at %s", string(p), pieceLocation.Name())
 	}
 	pieceLocation.RemovePiece(p)
 	next.AddPiece(p)

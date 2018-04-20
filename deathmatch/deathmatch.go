@@ -52,7 +52,7 @@ func (d *deathmatch) isGameOver() error {
 		return errors.New("every man for himself! the world is collapsing")
 	}
 	if !d.board.HasLinks() {
-		return errors.New("game over - all aliens are stuck")
+		return errors.New("game over - all aliens are trapped")
 	}
 	if len(d.board.Pieces()) < 2 {
 		return errors.New("war is over")
@@ -64,7 +64,7 @@ func (d *deathmatch) movePieces() {
 	// First, move aliens
 	for _, piece := range d.board.Pieces() {
 		if err := d.board.MovePiece(piece); err != nil {
-			log.Printf("piece.Wander: %s", err.Error())
+			log.Print(err.Error())
 		}
 	}
 }
