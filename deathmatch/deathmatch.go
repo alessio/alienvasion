@@ -71,7 +71,7 @@ func (d *deathmatch) isGameOver() error {
 		return errors.New("every man for himself! the world is collapsing")
 	}
 	if !d.board.HasLinks() {
-		return errors.New("game over - all aliens are trapped")
+		return errors.New("all links have been destroyed")
 	}
 	if len(d.board.Pieces()) < 2 {
 		return errors.New("war is over")
