@@ -79,17 +79,15 @@ func main() {
 	} else {
 		b = mustParseBoard(inputFile)
 	}
-	fmt.Println("Board generated and aliens deployed:")
-	board.PrintBoard(b, 4)
 	// Initialise the simulation
 	dm := deathmatch.NewDeathMatch(b, maxmoves)
 	dm.KickOff(naliens)
 	for dm.ExecuteTurn() {
 		fmt.Println("Board:")
-		board.PrintBoard(b, 4)
+		board.PrintBoard(b, 4, true)
 	}
 	fmt.Println("What is left of the world?")
-	board.PrintBoard(b, 4)
+	board.PrintBoard(b, 4, false)
 }
 
 func mustParseBoard(reader io.Reader) board.Board {
