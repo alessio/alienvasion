@@ -20,6 +20,7 @@ type Board interface {
 	Locations() []Location
 	MovePiece(p Piece) error
 	Pieces() []Piece
+	WhereIs(p Piece) Location
 }
 
 type worldMap struct {
@@ -118,6 +119,10 @@ func (w *worldMap) MovePiece(p Piece) error {
 	next.AddPiece(p)
 	w.pieces[p] = next
 	return nil
+}
+
+func (w *worldMap) WhereIs(p Piece) Location {
+	return w.pieces[p]
 }
 
 func pickRandomNeighbour(location Location) Location {

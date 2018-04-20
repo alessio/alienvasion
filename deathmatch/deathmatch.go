@@ -41,6 +41,12 @@ func (d *deathmatch) ExecuteTurn() bool {
 	}
 	d.movePieces()
 	d.fight()
+	// print out pieces
+	s := ""
+	for _, p := range d.board.Pieces() {
+		s += fmt.Sprintf("%v:%s ", p, d.board.WhereIs(p).Name())
+	}
+	log.Println("pieces still alive:", s)
 	return true
 }
 

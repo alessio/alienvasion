@@ -83,11 +83,10 @@ func main() {
 	dm := deathmatch.NewDeathMatch(b, maxmoves)
 	dm.KickOff(naliens)
 	for dm.ExecuteTurn() {
-		fmt.Println("Board:")
-		board.PrintBoard(b, 4, true)
+		//
 	}
 	fmt.Println("What is left of the world?")
-	board.PrintBoard(b, 4, false)
+	board.PrintBoard(b, 4)
 }
 
 func mustParseBoard(reader io.Reader) board.Board {
