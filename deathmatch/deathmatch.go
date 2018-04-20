@@ -25,8 +25,8 @@ func (d *deathmatch) Board() board.Board {
 
 func (d *deathmatch) KickOff(npieces int) {
 	for i := 0; i < npieces; i++ {
-		pieceName := fmt.Sprintf("%s-%d", generateSillyName(), i)
-		d.board.DeployRandPiece(pieceName)
+		d.board.DeployPiece(board.Piece(
+			fmt.Sprintf("%s-%d", generateSillyName(), i)))
 	}
 }
 
@@ -59,7 +59,7 @@ func (d *deathmatch) isGameOver() error {
 func (d *deathmatch) movePieces() {
 	// First, move aliens
 	for _, piece := range d.board.Pieces() {
-		if err := piece.Wander(); err != nil {
+		if err := d.board.MovePiece(piece); err != nil {
 			log.Printf("piece.Wander: %s", err.Error())
 		}
 	}
@@ -68,7 +68,7 @@ func (d *deathmatch) movePieces() {
 func (d *deathmatch) fight() {
 	for _, location := range d.board.Locations() {
 		if len(location.Pieces()) >= 2 {
-			d.board.DestroyLocation(location)
+			d.board.DestroyLocation(location.Name())
 		}
 	}
 }
