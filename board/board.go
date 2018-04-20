@@ -9,11 +9,11 @@ type board struct{}
 
 // Board defines the
 type Board interface {
-	// Functional to board creation
+	// Functional to board creation/initialization
 	AddLocation(name string)
 	LinkLocations(from, to string, dir Direction) error
-	// Functional to death match simulation
 	DeployPiece(p Piece)
+	// Functional to death match simulation
 	DestroyLocation(name string)
 	HasLinks() bool
 	Location(name string) Location
@@ -36,7 +36,14 @@ func NewBoard() *worldMap {
 
 func (w *worldMap) AddLocation(name string) { w.locations[name] = NewLocation(name) }
 func (w *worldMap) DeployPiece(p Piece) {
-	panic("notimplemented")
+	for _, location := range w.locations {
+		if len(location.Pieces()) == 0 {
+			location.AddPiece(p)
+			w.pieces[p] = location
+			return
+		}
+	}
+	panic("there are no free locations left")
 }
 
 func (w *worldMap) DestroyLocation(name string) {
@@ -104,11 +111,12 @@ func (w *worldMap) MovePiece(p Piece) error {
 		panic(fmt.Sprintf("piece %q does not exist", string(p)))
 	}
 	next := pickRandomNeighbour(pieceLocation)
-	if next != nil {
+	if next == nil {
 		return fmt.Errorf("%s got stuck at %s", string(p), pieceLocation.Name())
 	}
 	pieceLocation.RemovePiece(p)
 	next.AddPiece(p)
+	w.pieces[p] = next
 	return nil
 }
 
