@@ -1,5 +1,7 @@
 # alienvasion
 
+[![CircleCI](https://circleci.com/gh/alessio/alienvasion.svg?style=svg)](https://circleci.com/gh/alessio/alienvasion)
+
 ## Getting Started
 
 Just go get-and-install and run it:
