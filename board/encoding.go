@@ -14,8 +14,8 @@ func DecodeBoard(reader io.Reader) (*Board, error) {
 	b := NewBoard()
 	for lineNo := 0; scanner.Scan(); lineNo++ {
 		line := scanner.Text()
-		if strings.HasPrefix(line, "#") {
-			continue // skip comments
+		if strings.HasPrefix(line, "#") || len(strings.TrimSpace(line)) == 0 {
+			continue // skip comments and blank lines
 		}
 		tokens := strings.Split(line, " ")
 		if len(tokens) < 2 {
