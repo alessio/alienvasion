@@ -29,6 +29,9 @@ func DecodeBoard(reader io.Reader) (*Board, error) {
 				return nil, fmt.Errorf("line %d: couldn't parse token %q", lineNo, tok)
 			}
 			dir := Direction(locDir[0])
+			if !dir.Validate() {
+				return nil, fmt.Errorf("line %d: couldn't parse location %q", lineNo, dir)
+			}
 			target := Location(locDir[1])
 			b.AddLocation(target)
 			if err := b.LinkLocations(baseLocation, target, dir); err != nil {

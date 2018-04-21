@@ -14,6 +14,7 @@ const (
 
 type Direction string
 
+func (d Direction) Validate() bool { return d == North || d == South || d == West || d == East }
 func (d Direction) Opposite() Direction {
 	switch d {
 	case North:
