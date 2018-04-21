@@ -75,7 +75,7 @@ func (d *DeathMatch) isGameOver() error {
 		return fmt.Errorf("reached maximum number of moves")
 	}
 	if d.board.Locations() == nil {
-		return errors.New("all links have been destroyed")
+		return errors.New("all locations have been destroyed")
 	}
 	if len(d.board.Pieces()) < 2 {
 		return errors.New("war is over")

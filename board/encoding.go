@@ -29,7 +29,9 @@ func DecodeBoard(reader io.Reader) (*Board, error) {
 			dir := Direction(locDir[0])
 			target := Location(locDir[1])
 			b.AddLocation(target)
-			b.LinkLocations(baseLocation, target, dir)
+			if err := b.LinkLocations(baseLocation, target, dir); err != nil {
+				return nil, fmt.Errorf("line %d: couldn't link %s and %s: %v", lineNo, baseLocation, target, err)
+			}
 		}
 		lineNo++
 	}

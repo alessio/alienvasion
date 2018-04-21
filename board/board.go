@@ -50,11 +50,18 @@ func (b *Board) AddLocation(l Location) {
 	}
 }
 
-func (b *Board) LinkLocations(l1, l2 Location, dir Direction) {
+func (b *Board) LinkLocations(l1, l2 Location, dir Direction) error {
 	oppositeDir := dir.Opposite()
 	b.AddLocation(l2)
+	if loc, ok := b.links[l1][dir]; ok && loc != l2 {
+		return fmt.Errorf("couldn't overwrite link between %s and %s (%s)", l1, loc, dir)
+	}
+	if loc, ok := b.links[l2][oppositeDir]; ok && loc != l1 {
+		return fmt.Errorf("couldn't overwrite link between %s and %s (%s)", l2, loc, oppositeDir)
+	}
 	b.links[l1][dir] = l2
 	b.links[l2][oppositeDir] = l1
+	return nil
 }
 
 func (b *Board) Deploy(l Location, p Piece) {
@@ -121,15 +128,11 @@ func (b *Board) AreNeighbours(l1, l2 Location) bool {
 	return false
 }
 
-func (b *Board) Locations() []Location {
-	if len(b.links) == 0 {
-		return nil
-	}
-	locations := []Location{}
+func (b *Board) Locations() (locations []Location) {
 	for loc := range b.links {
 		locations = append(locations, loc)
 	}
-	return locations
+	return
 }
 
 func (b *Board) PiecesByLocation() map[Location][]Piece {
