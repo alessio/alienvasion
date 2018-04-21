@@ -71,8 +71,8 @@ func main() {
 	if filename != "" {
 		fp = mustOpenFile(filename)
 	}
-	b := mustParseBoard(fp)
-	print(board.EncodeBoard(b))
+	b := mustDecodeBoard(fp)
+	board.EncodeBoard(b, os.Stdout)
 	//Initialise the simulation
 	dm := deathmatch.NewDeathMatch(b, maxmoves)
 	dm.KickOff(naliens)
@@ -80,7 +80,7 @@ func main() {
 		//
 	}
 	fmt.Println("What is left of the world?")
-	print(board.EncodeBoard(b))
+	board.EncodeBoard(b, os.Stdout)
 }
 
 func mustOpenFile(filename string) io.Reader {
@@ -91,8 +91,8 @@ func mustOpenFile(filename string) io.Reader {
 	return fp
 }
 
-func mustParseBoard(reader io.Reader) *board.Board {
-	b, err := board.ParseBoard(reader)
+func mustDecodeBoard(reader io.Reader) *board.Board {
+	b, err := board.DecodeBoard(reader)
 	if err != nil {
 		log.Fatalf("board.ParseBoard: %v", err)
 	}

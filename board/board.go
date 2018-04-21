@@ -43,6 +43,7 @@ func NewBoard() *Board {
 	}
 }
 
+func (b *Board) Pieces() map[Piece]Location { return b.pieces }
 func (b *Board) AddLocation(l Location) {
 	if _, ok := b.links[l]; !ok {
 		b.links[l] = make(map[Direction]Location)
@@ -150,8 +151,4 @@ func (b *Board) Destroy(l Location, pieces []Piece) {
 		delete(b.links[neighbour], dir.Opposite())
 	}
 	delete(b.links, l)
-}
-
-func (b *Board) Pieces() map[Piece]Location {
-	return b.pieces
 }
