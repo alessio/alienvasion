@@ -10,11 +10,13 @@ import (
 // ParseBoard initializes a board configuration
 // from an io.Reader's input.
 func DecodeBoard(reader io.Reader) (*Board, error) {
-	lineNo := 0
 	scanner := bufio.NewScanner(reader)
 	b := NewBoard()
-	for scanner.Scan() {
+	for lineNo := 0; scanner.Scan(); lineNo++ {
 		line := scanner.Text()
+		if strings.HasPrefix(line, "#") {
+			continue // skip comments
+		}
 		tokens := strings.Split(line, " ")
 		if len(tokens) < 2 {
 			return nil, fmt.Errorf("line %d: invalid location (unlinked)", lineNo)
@@ -33,7 +35,6 @@ func DecodeBoard(reader io.Reader) (*Board, error) {
 				return nil, fmt.Errorf("line %d: couldn't link %s and %s: %v", lineNo, baseLocation, target, err)
 			}
 		}
-		lineNo++
 	}
 	return b, nil
 }
