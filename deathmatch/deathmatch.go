@@ -77,13 +77,26 @@ func (d *DeathMatch) isGameOver() error {
 	if d.board.Locations() == nil {
 		return errors.New("all locations have been destroyed")
 	}
-	switch len(d.board.Pieces()) {
+	nAlivePieces := len(d.board.Pieces())
+	switch nAlivePieces {
 	case 0:
 		return errors.New("all pieces have been removed")
 	case 1:
 		return errors.New("we've got a winner")
 	}
+	if nAlivePieces-d.trappedPieces() == 0 {
+		return errors.New("all pieces are trapped")
+	}
 	return nil
+}
+
+func (d *DeathMatch) trappedPieces() (count int) {
+	for p := range d.board.Pieces() {
+		if neighbours := d.board.PieceNeighbourLocations(p); len(neighbours) == 0 {
+			count++
+		}
+	}
+	return
 }
 
 func (d *DeathMatch) movePieces() {
