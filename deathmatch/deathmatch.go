@@ -77,8 +77,11 @@ func (d *DeathMatch) isGameOver() error {
 	if d.board.Locations() == nil {
 		return errors.New("all locations have been destroyed")
 	}
-	if len(d.board.Pieces()) < 2 {
-		return errors.New("war is over")
+	switch len(d.board.Pieces()) {
+	case 0:
+		return errors.New("all pieces have been removed")
+	case 1:
+		return errors.New("we've got a winner")
 	}
 	return nil
 }
