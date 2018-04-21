@@ -64,32 +64,34 @@ through it. This may lead to aliens getting "trapped".
 }
 
 func main() {
-	var b board.Board
-	var inputFile io.Reader
+	var fp io.Reader = os.Stdin
 	flag.Parse()
 	validateFlags()
 	// Initialise the board
-	inputFile = os.Stdin
 	if filename != "" {
-		inputFile, err := os.Open(filename)
-		if err != nil {
-			log.Fatal(err)
-		}
-		b = mustParseBoard(inputFile)
-	} else {
-		b = mustParseBoard(inputFile)
+		fp = mustOpenFile(filename)
 	}
-	// Initialise the simulation
+	b := mustParseBoard(fp)
+	print(board.EncodeBoard(b))
+	//Initialise the simulation
 	dm := deathmatch.NewDeathMatch(b, maxmoves)
 	dm.KickOff(naliens)
 	for dm.ExecuteTurn() {
 		//
 	}
 	fmt.Println("What is left of the world?")
-	board.PrintBoard(b, 4)
+	print(board.EncodeBoard(b))
 }
 
-func mustParseBoard(reader io.Reader) board.Board {
+func mustOpenFile(filename string) io.Reader {
+	fp, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return fp
+}
+
+func mustParseBoard(reader io.Reader) *board.Board {
 	b, err := board.ParseBoard(reader)
 	if err != nil {
 		log.Fatalf("board.ParseBoard: %v", err)

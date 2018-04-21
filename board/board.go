@@ -5,131 +5,153 @@ import (
 	"math/rand"
 )
 
-type board struct{}
+const (
+	North = Direction("north")
+	South = Direction("south")
+	West  = Direction("west")
+	East  = Direction("east")
+)
 
-// Board defines the
-type Board interface {
-	// Functional to board creation/initialization
-	AddLocation(name string)
-	LinkLocations(from, to string, dir Direction) error
-	DeployPiece(p Piece) Location
-	// Functional to death match simulation
-	DestroyLocation(name string)
-	HasLinks() bool
-	Location(name string) Location
-	Locations() []Location
-	MovePiece(p Piece) error
-	Pieces() []Piece
-	WhereIs(p Piece) Location
+type Direction string
+
+func (d Direction) Opposite() Direction {
+	switch d {
+	case North:
+		return South
+	case South:
+		return North
+	case West:
+		return East
+	case East:
+		return West
+	}
+	panic("invalid direction")
 }
 
-type worldMap struct {
-	locations map[string]Location
-	pieces    map[Piece]Location
+type Location string
+type Piece string
+
+type Board struct {
+	links  map[Location]map[Direction]Location
+	pieces map[Piece]Location
 }
 
-func NewBoard() *worldMap {
-	return &worldMap{
-		locations: make(map[string]Location),
-		pieces:    make(map[Piece]Location),
+func NewBoard() *Board {
+	return &Board{
+		links:  make(map[Location]map[Direction]Location),
+		pieces: make(map[Piece]Location),
 	}
 }
 
-func (w *worldMap) AddLocation(name string) { w.locations[name] = NewLocation(name) }
-func (w *worldMap) DeployPiece(p Piece) Location {
-	locations := w.Locations()
-	if len(locations) == 0 {
-		panic("no locations left")
+func (b *Board) AddLocation(l Location) {
+	if _, ok := b.links[l]; !ok {
+		b.links[l] = make(map[Direction]Location)
 	}
-	l := w.Locations()[rand.Intn(len(locations))]
-	l.AddPiece(p)
-	w.pieces[p] = l
-	return l
 }
 
-func (w *worldMap) DestroyLocation(name string) {
-	location, ok := w.locations[name]
+func (b *Board) LinkLocations(l1, l2 Location, dir Direction) {
+	oppositeDir := dir.Opposite()
+	b.AddLocation(l2)
+	b.links[l1][dir] = l2
+	b.links[l2][oppositeDir] = l1
+}
+
+func (b *Board) Deploy(l Location, p Piece) {
+	if _, ok := b.pieces[p]; ok {
+		panic("%s already exists")
+	}
+	b.pieces[p] = l
+}
+
+func (b *Board) PieceNeighbourLocations(p Piece) []Location {
+	loc, ok := b.pieces[p]
 	if !ok {
-		panic(fmt.Sprintf("location %q does not exist", name))
+		panic("piece slipped off the board")
 	}
-	location.DestroyLinks()
-	pieces := location.Pieces()
-	for _, p := range pieces {
-		delete(w.pieces, p)
+	dirmap := b.links[loc]
+	if dirmap == nil {
+		return nil
 	}
-	delete(w.locations, name)
+	locations := []Location{}
+	for _, loc := range dirmap {
+		locations = append(locations, loc)
+	}
+	return locations
 }
 
-func (w *worldMap) LinkLocations(from, to string, dir Direction) error {
-	fromLocation, ok := w.locations[from]
-	if !ok {
-		return fmt.Errorf("location %q does not exist", from)
+func (b *Board) Wander(p Piece) (Location, error) {
+	locations := b.PieceNeighbourLocations(p)
+	if locations == nil || len(locations) == 0 {
+		return "", fmt.Errorf("%s is trapped at %s", p, b.pieces[p])
 	}
-	toLocation, ok := w.locations[to]
-	if !ok {
-		return fmt.Errorf("location %q does not exist", to)
+	b.pieces[p] = locations[rand.Intn(len(locations))]
+	return b.pieces[p], nil
+}
+func (b *Board) move(p Piece, l Location) {
+	currentLoc := b.pieces[p]
+	if !b.AreNeighbours(currentLoc, l) {
+		panic(fmt.Sprintf("%s attempted to make an invalid move from %s to %s", p, currentLoc, l))
 	}
-	fromLocation.LinkToNeighbour(dir, toLocation)
-	toLocation.LinkToNeighbour(OppositeDirection(dir), fromLocation)
-	return nil
+	b.pieces[p] = l
 }
 
-func (w *worldMap) HasLinks() bool {
-	for _, location := range w.locations {
-		if len(location.ReachableNeighbours()) > 0 {
+func (b *Board) Neighbours(l Location) []Location {
+	dirmap, ok := b.links[l]
+	if !ok {
+		return nil
+	}
+	neighbours := []Location{}
+	for _, adj := range dirmap {
+		neighbours = append(neighbours, adj)
+	}
+	return neighbours
+}
+
+func (b *Board) AreNeighbours(l1, l2 Location) bool {
+	dirmap, ok := b.links[l1]
+	if !ok {
+		return false
+	}
+	for _, neigh := range dirmap {
+		if neigh == l2 {
 			return true
 		}
 	}
 	return false
 }
 
-func (w *worldMap) Pieces() []Piece {
-	pieces := []Piece{}
-	for p := range w.pieces {
-		pieces = append(pieces, p)
+func (b *Board) Locations() []Location {
+	if len(b.links) == 0 {
+		return nil
 	}
-	return pieces
-}
-
-func (w *worldMap) Location(name string) Location {
-	if location, ok := w.locations[name]; ok {
-		return location
-	}
-	return nil
-}
-
-func (w *worldMap) Locations() []Location {
 	locations := []Location{}
-	for _, location := range w.locations {
-		locations = append(locations, location)
+	for loc := range b.links {
+		locations = append(locations, loc)
 	}
 	return locations
 }
 
-func (w *worldMap) MovePiece(p Piece) error {
-	pieceLocation, ok := w.pieces[p]
-	if !ok {
-		panic(fmt.Sprintf("piece %q does not exist", string(p)))
+func (b *Board) PiecesByLocation() map[Location][]Piece {
+	piecesByLocation := make(map[Location][]Piece)
+	for p, loc := range b.pieces {
+		if _, ok := piecesByLocation[loc]; !ok {
+			piecesByLocation[loc] = []Piece{}
+		}
+		piecesByLocation[loc] = append(piecesByLocation[loc], p)
 	}
-	next := pickRandomNeighbour(pieceLocation)
-	if next == nil {
-		return fmt.Errorf("%s trapped at %s", string(p), pieceLocation.Name())
-	}
-	pieceLocation.RemovePiece(p)
-	next.AddPiece(p)
-	w.pieces[p] = next
-	return nil
+	return piecesByLocation
 }
 
-func (w *worldMap) WhereIs(p Piece) Location {
-	return w.pieces[p]
+func (b *Board) Destroy(l Location, pieces []Piece) {
+	for _, p := range pieces {
+		delete(b.pieces, p)
+	}
+	for dir, neighbour := range b.links[l] {
+		delete(b.links[neighbour], dir.Opposite())
+	}
+	delete(b.links, l)
 }
 
-func pickRandomNeighbour(location Location) Location {
-	neighbours := location.ReachableNeighbours()
-	count := len(neighbours)
-	if count == 0 {
-		return nil
-	}
-	return neighbours[rand.Intn(count)]
+func (b *Board) Pieces() map[Piece]Location {
+	return b.pieces
 }
