@@ -48,26 +48,11 @@ func (d *DeathMatch) ExecuteTurn() bool {
 	}
 	d.movePieces()
 	d.fight()
-	// // print out pieces
-	log.Println(" - pieces still alive:", alivePieces(d.board))
-	log.Println(" - locations still standing:", stillStandingLocations(d.board))
 	return true
 }
 
-func stillStandingLocations(b *board.Board) string {
-	s := ""
-	for _, l := range b.Locations() {
-		s += fmt.Sprintf("%s ", l)
-	}
-	return s
-}
-
-func alivePieces(b *board.Board) string {
-	s := ""
-	for p, loc := range b.Pieces() {
-		s += fmt.Sprintf("%v:%s ", p, loc)
-	}
-	return s
+func (d *DeathMatch) Turn() int {
+	return d.turn
 }
 
 func (d *DeathMatch) isGameOver() error {

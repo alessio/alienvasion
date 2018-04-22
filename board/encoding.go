@@ -42,10 +42,10 @@ func DecodeBoard(reader io.Reader) (*Board, error) {
 	return b, nil
 }
 
-func EncodeBoard(b *Board, writer io.Writer) {
+func EncodeBoard(b *Board, writer io.Writer, linePrefix string) {
 	var s string
 	for baselocation, dirmap := range b.links {
-		s += fmt.Sprintf("%s:", baselocation)
+		s += fmt.Sprintf("%s%s:", linePrefix, baselocation)
 		for dir, target := range dirmap {
 			s += fmt.Sprintf(" %s=%s", dir, target)
 		}

@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -25,6 +26,7 @@ var (
 	naliens  int
 	maxmoves int
 	filename string
+	verbose  bool
 )
 
 func init() {
@@ -59,6 +61,7 @@ through it. This may lead to aliens getting "trapped".
 	flag.IntVar(&naliens, "naliens", DefaultNAliens, "generate N aliens")
 	flag.IntVar(&maxmoves, "maxmoves", DefaultMaxMoves, "max number of moves each alien can make")
 	flag.StringVar(&filename, "file", "", "read map from file instead of STDIN")
+	flag.BoolVar(&verbose, "verbose", false, "turn on verbose mode")
 	log.SetPrefix(fmt.Sprintf("%s: ", path.Base(os.Args[0])))
 	//	log.SetFlags(0)
 }
@@ -72,15 +75,40 @@ func main() {
 		fp = mustOpenFile(filename)
 	}
 	b := mustDecodeBoard(fp)
-	board.EncodeBoard(b, os.Stdout)
+	board.EncodeBoard(b, os.Stdout, "")
+	if !verbose {
+		log.SetFlags(0)
+		log.SetOutput(ioutil.Discard)
+	}
 	//Initialise the simulation
 	dm := deathmatch.NewDeathMatch(b, maxmoves)
 	dm.KickOff(naliens)
 	for dm.ExecuteTurn() {
-		//
+		fmt.Printf(`- End of turn #%d
+  Cities: %s,
+  Aliens: %s
+`, dm.Turn(), stillStandingLocations(b), alivePieces(b))
+		// print out the new board
+		board.EncodeBoard(b, os.Stdout, "   ")
 	}
 	fmt.Println("What is left of the world?")
-	board.EncodeBoard(b, os.Stdout)
+	board.EncodeBoard(b, os.Stdout, "   ")
+}
+
+func stillStandingLocations(b *board.Board) string {
+	s := ""
+	for _, l := range b.Locations() {
+		s += fmt.Sprintf("%s ", l)
+	}
+	return s
+}
+
+func alivePieces(b *board.Board) string {
+	s := ""
+	for p, loc := range b.Pieces() {
+		s += fmt.Sprintf("%v:%s ", p, loc)
+	}
+	return s
 }
 
 func mustOpenFile(filename string) io.Reader {
