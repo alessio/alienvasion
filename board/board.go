@@ -52,6 +52,9 @@ func (b *Board) AddLocation(l Location) {
 }
 
 func (b *Board) LinkLocations(l1, l2 Location, dir Direction) error {
+	if l1 == l2 {
+		return fmt.Errorf("loop detected")
+	}
 	oppositeDir := dir.Opposite()
 	b.AddLocation(l2)
 	if loc, ok := b.links[l1][dir]; ok && loc != l2 {

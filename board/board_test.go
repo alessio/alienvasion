@@ -58,6 +58,10 @@ func TestBoard_LinkLocations(t *testing.T) {
 	b.AddLocation(Location("3"))
 	require.Equal(t, len(b.Locations()), 4)
 	require.Equal(t, len(b.links), 4)
+
+	// loops are forbidden
+	assert.NotNil(t, b.LinkLocations(Location("0"), Location("0"), East))
+
 	b.LinkLocations(Location("0"), Location("1"), Direction("north"))
 	b.LinkLocations(Location("0"), Location("2"), Direction("south"))
 	b.LinkLocations(Location("2"), Location("3"), Direction("west"))
