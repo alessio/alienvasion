@@ -33,13 +33,13 @@ func TestDirection_Opposite(t *testing.T) {
 }
 
 func TestNewBoard(t *testing.T) {
-	got := NewBoard()
+	got := New()
 	assert.Nil(t, got.Locations())
 	assert.Equal(t, got.Pieces(), make(map[Piece]Location))
 }
 
 func TestBoard_AddLocation(t *testing.T) {
-	b := NewBoard()
+	b := New()
 	require.Nil(t, b.Locations())
 	b.AddLocation("loc-00")
 	assert.Equal(t, b.Locations(), []Location{Location("loc-00")})
@@ -51,7 +51,7 @@ func TestBoard_AddLocation(t *testing.T) {
 }
 
 func TestBoard_LinkLocations(t *testing.T) {
-	b := NewBoard()
+	b := New()
 	b.AddLocation(Location("0"))
 	b.AddLocation(Location("1"))
 	b.AddLocation(Location("2"))
@@ -74,7 +74,7 @@ func TestBoard_LinkLocations(t *testing.T) {
 }
 
 func TestBoard_Deploy(t *testing.T) {
-	b := NewBoard()
+	b := New()
 	b.AddLocation(Location("0"))
 	b.AddLocation(Location("1"))
 	b.Deploy(Location("0"), Piece("a"))
@@ -84,7 +84,7 @@ func TestBoard_Deploy(t *testing.T) {
 }
 
 func TestBoard_PieceNeighbourLocations(t *testing.T) {
-	b := NewBoard()
+	b := New()
 	b.AddLocation(Location("0"))
 	b.AddLocation(Location("1"))
 	b.AddLocation(Location("2"))
@@ -101,7 +101,7 @@ func TestBoard_PieceNeighbourLocations(t *testing.T) {
 }
 
 func TestBoard_Wander(t *testing.T) {
-	b := NewBoard()
+	b := New()
 	b.AddLocation(Location("0"))
 	b.AddLocation(Location("1"))
 	b.AddLocation(Location("2"))
@@ -118,7 +118,7 @@ func TestBoard_Wander(t *testing.T) {
 }
 
 func TestBoard_move(t *testing.T) {
-	b := NewBoard()
+	b := New()
 	b.AddLocation(Location("0"))
 	b.AddLocation(Location("1"))
 	b.AddLocation(Location("2"))
@@ -135,7 +135,7 @@ func TestBoard_move(t *testing.T) {
 }
 
 func TestBoard_PiecesByLocation(t *testing.T) {
-	b := NewBoard()
+	b := New()
 	b.AddLocation(Location("0"))
 	b.AddLocation(Location("1"))
 	b.AddLocation(Location("2"))
@@ -149,7 +149,7 @@ func TestBoard_PiecesByLocation(t *testing.T) {
 }
 
 func TestBoard_Destroy(t *testing.T) {
-	b := NewBoard()
+	b := New()
 	b.AddLocation(Location("0"))
 	b.AddLocation(Location("1"))
 	b.Deploy(Location("0"), Piece("a"))

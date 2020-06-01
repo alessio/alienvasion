@@ -37,7 +37,7 @@ type Board struct {
 	pieces map[Piece]Location
 }
 
-func NewBoard() *Board {
+func New() *Board {
 	return &Board{
 		links:  make(map[Location]map[Direction]Location),
 		pieces: make(map[Piece]Location),

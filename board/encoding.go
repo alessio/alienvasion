@@ -9,9 +9,9 @@ import (
 
 // ParseBoard initializes a board configuration
 // from an io.Reader's input.
-func DecodeBoard(reader io.Reader) (*Board, error) {
+func Decode(reader io.Reader) (*Board, error) {
 	scanner := bufio.NewScanner(reader)
-	b := NewBoard()
+	b := New()
 	for lineNo := 0; scanner.Scan(); lineNo++ {
 		line := scanner.Text()
 		if strings.HasPrefix(line, "#") || len(strings.TrimSpace(line)) == 0 {
@@ -42,7 +42,7 @@ func DecodeBoard(reader io.Reader) (*Board, error) {
 	return b, nil
 }
 
-func EncodeBoard(b *Board, writer io.Writer) {
+func Encode(b *Board, writer io.Writer) {
 	var s string
 	for baselocation, dirmap := range b.links {
 		s += fmt.Sprintf("%s:", baselocation)
