@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDecodeBoard(t *testing.T) {
+func TestDecode(t *testing.T) {
 	tests := []struct {
 		name       string
 		input      string
@@ -22,7 +22,7 @@ func TestDecodeBoard(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			reader := strings.NewReader(tt.input)
-			b, err := DecodeBoard(reader)
+			b, err := Decode(reader)
 			assert.Equal(t, tt.wantErr, (err != nil))
 			if err == nil {
 				assert.Equal(t, len(b.Locations()), tt.nlocations)
@@ -31,7 +31,7 @@ func TestDecodeBoard(t *testing.T) {
 	}
 }
 
-func TestEncodeBoard(t *testing.T) {
+func TestEncode(t *testing.T) {
 	type args struct {
 		b *Board
 	}
@@ -45,9 +45,9 @@ func TestEncodeBoard(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			writer := &bytes.Buffer{}
-			EncodeBoard(tt.args.b, writer)
+			Encode(tt.args.b, writer)
 			if gotWriter := writer.String(); gotWriter != tt.wantWriter {
-				t.Errorf("EncodeBoard() = %v, want %v", gotWriter, tt.wantWriter)
+				t.Errorf("Encode() = %v, want %v", gotWriter, tt.wantWriter)
 			}
 		})
 	}

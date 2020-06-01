@@ -10,7 +10,7 @@ import (
 func TestDeathMatch_isGameOver(t *testing.T) {
 	var d *DeathMatch
 	makeBoard := func() *board.Board {
-		b := board.NewBoard()
+		b := board.New()
 		b.AddLocation("a")
 		b.AddLocation("b")
 		b.AddLocation("c")
@@ -22,7 +22,7 @@ func TestDeathMatch_isGameOver(t *testing.T) {
 		return b
 	}
 	// No locations on the board
-	d = NewDeathMatch(board.NewBoard(), 10)
+	d = NewDeathMatch(board.New(), 10)
 	assert.Panics(t, func() { d.KickOff(10) })
 
 	// No pieces on the board
