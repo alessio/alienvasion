@@ -1,6 +1,7 @@
 # alienvasion
 
 ![Build](https://github.com/alessio/alienvasion/actions/workflows/build.yml/badge.svg)
+[![codecov](https://codecov.io/gh/alessio/alienvasion/branch/master/graph/badge.svg?token=MDAtUe6ZQV)](https://codecov.io/gh/alessio/alienvasion)
 
 ## Getting Started
 
