@@ -1,7 +1,6 @@
 # alienvasion
 
-[![CircleCI](https://circleci.com/gh/alessio/alienvasion.svg?style=svg)](https://circleci.com/gh/alessio/alienvasion)
-[![Build Status](https://travis-ci.com/alessio/alienvasion.svg?branch=master)](https://travis-ci.com/alessio/alienvasion)
+![Build](https://github.com/alessio/alienvasion/actions/workflows/build.yml/badge.svg)
 
 ## Getting Started
 
